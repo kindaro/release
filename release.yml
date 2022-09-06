@@ -1,4 +1,4 @@
-name: Stan Release
+name: ${name_of_program} Release
 
 on:
   # Trigger the workflow on the new 'v*' tag created
@@ -76,14 +76,14 @@ jobs:
       - name: Build binary
         run: |
           mkdir dist
-          cabal install exe:stan --install-method=copy --overwrite-policy=always --installdir=dist
+          cabal install exe:${name_of_program} --install-method=copy --overwrite-policy=always --installdir=dist
 
       - if: matrix.os == 'windows-latest'
         name: Set extension to .exe on Windows
         run: echo "::set-env name=EXT::.exe"
 
       - name: Set binary path name
-        run: echo "::set-env name=BINARY_PATH::./dist/stan${{ env.EXT }}"
+        run: echo "::set-env name=BINARY_PATH::./dist/${name_of_program}${{ env.EXT }}"
 
       - name: Compress binary
         uses: svenstaro/upx-action@2.0.1
@@ -108,5 +108,5 @@ jobs:
         with:
           upload_url: ${{ steps.get_release_info.outputs.upload_url }}
           asset_path: ${{ env.BINARY_PATH }}
-          asset_name: stan-${{ steps.tag.outputs.tag }}-${{ runner.os }}-ghc-${{ matrix.ghc }}${{ env.EXT }}
+          asset_name: ${name_of_program}-${{ steps.tag.outputs.tag }}-${{ runner.os }}-ghc-${{ matrix.ghc }}${{ env.EXT }}
           asset_content_type: application/octet-stream
