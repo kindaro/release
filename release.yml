@@ -1,4 +1,4 @@
-name: ${name_of_program} Release
+name: Release
 
 on:
   # Trigger the workflow on the new 'v*' tag created
@@ -10,7 +10,16 @@ jobs:
   create_release:
     name: Create Github Release
     runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
+      - name: Wait for tests to succeed
+        uses: lewagon/wait-on-check-action@v1.0.0
+        with:
+          ref: ${{ github.ref }}
+          check-regexp: '^Haskell-CI.*$'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
       - name: Check out code
         uses: actions/checkout@v3
 
@@ -25,14 +34,6 @@ jobs:
           draft: true
           prerelease: false
 
-      - name: Output Release URL File
-        run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
-      - name: Save Release URL File for publish
-        uses: actions/upload-artifact@v3
-        with:
-          name: release_url
-          path: release_url.txt
-
   build_artifact:
     needs: [create_release]
     name: ${{ matrix.os }}/GHC ${{ matrix.ghc }}/${{ github.ref }}
@@ -41,37 +42,35 @@ jobs:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
         ghc:
-          - "8.8.4"
-          - "8.10.3"
-        cabal: ["3.2"]
+          - 8.10.7
+        cabal: ["3.6.2.0"]
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Check out code
         uses: actions/checkout@v3
 
       - name: Set tag name
-        uses: olegtarasov/get-tag@v2
+        uses: olegtarasov/get-tag@v2.1
         id: tag
         with:
           tagRegex: "v(.*)"
           tagRegexGroup: 1
 
       - name: Setup Haskell
-        uses: haskell/actions/setup@v2.0.0
+        uses: haskell/actions/setup@v2
         id: setup-haskell-cabal
         with:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ matrix.cabal }}
 
-      - name: Freeze
-        run: |
-          cabal freeze
-
       - name: Cache ~/.cabal/store
         uses: actions/cache@v3.0.5
         with:
           path: ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
-          key: ${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('cabal.project.freeze') }}
+          key: ${{ runner.os }}-ghc-${{ matrix.ghc }}-${{ github.sha }}
 
       - name: Build binary
         run: |
@@ -80,25 +79,15 @@ jobs:
 
       - if: matrix.os == 'windows-latest'
         name: Set extension to .exe on Windows
-        run: echo "::set-env name=EXT::.exe"
+        run: echo "EXT=.exe" >> $GITHUB_ENV
 
       - name: Set binary path name
-        run: echo "::set-env name=BINARY_PATH::./dist/${name_of_program}${{ env.EXT }}"
+        run: echo "BINARY_PATH=./dist/${name_of_program}${{ env.EXT }}" >> $GITHUB_ENV
 
       - name: Compress binary
         uses: svenstaro/upx-action@2.0.1
         with:
           file: ${{ env.BINARY_PATH }}
-
-      - name: Load Release URL File from release job
-        uses: actions/download-artifact@v3
-        with:
-          name: release_url
-
-      - name: Get Release File Name & Upload URL
-        id: get_release_info
-        run: |
-          echo "::set-output name=upload_url::$(cat release_url/release_url.txt)"
 
       - name: Upload Release Asset
         id: upload-release-asset
@@ -106,7 +95,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: ${{ env.BINARY_PATH }}
           asset_name: ${name_of_program}-${{ steps.tag.outputs.tag }}-${{ runner.os }}-ghc-${{ matrix.ghc }}${{ env.EXT }}
           asset_content_type: application/octet-stream
