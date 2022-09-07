@@ -1,6 +1,6 @@
 cabal-version:   2.2
 name:            release
-version:         0.2.1.0
+version:         0.2.1.1
 license:         NONE
 author:          kindaro@gmail.com
 maintainer:      Ignat Insarov
@@ -14,6 +14,6 @@ common warnings
 executable release
     import:           warnings
     main-is:          Main.hs
-    build-depends:    base
+    build-depends:    base, lens
     hs-source-dirs:   app
     default-language: Haskell2010
