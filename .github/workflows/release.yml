@@ -3,8 +3,6 @@ name: Release
 on:
   # Trigger the workflow on the new 'v*' tag created
   push:
-    branches:
-      - master
     tags:
       - "v*"
 
@@ -71,8 +69,8 @@ jobs:
       - name: Cache ~/.cabal/store
         uses: actions/cache@v2
         with:
+          key: ${{ runner.os }}-ghc-${{ matrix.ghc }}-${{ github.sha }}
           path: ~/.cabal/store
-          key: this-is-the-only-key
 
       - name: Build binary
         run: |
