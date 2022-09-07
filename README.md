@@ -25,3 +25,8 @@ Then you need to push tags to GitHub:
 ```
 
 Now you should see the workflow running on GitHub. After some time, you will see a draft release having been created, with built executables attached to it.
+
+## features
+
+* Will build executables for Linux, MacOS and Windows out of the box.
+* Will share workflow cache with [`haskell-ci`](https://github.com/haskell-CI/haskell-ci).
