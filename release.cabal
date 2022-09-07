@@ -1,0 +1,18 @@
+cabal-version:   3.8
+name:            release
+version:         0.1.0.0
+license:         NONE
+author:          kindaro@gmail.com
+maintainer:      Ignat Insarov
+build-type:      Simple
+extra-doc-files: CHANGELOG.md
+
+common warnings
+    ghc-options: -Wall
+
+executable release
+    import:           warnings
+    main-is:          Main.hs
+    build-depends:    base ^>=4.16.1.0
+    hs-source-dirs:   app
+    default-language: Haskell2010
