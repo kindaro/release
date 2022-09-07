@@ -66,6 +66,9 @@ jobs:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ matrix.cabal }}
 
+      - name: debug cache miss
+        run: echo ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
+
       - name: Cache ~/.cabal/store
         uses: actions/cache@v3.0.5
         with:
