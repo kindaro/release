@@ -4,9 +4,9 @@ Generate a GitHub workflow that automatically makes releases for your Haskell ex
 
 ## how does it work
 
-`./release.yml` is a template for `envsubst`, shipped with `gettext`, which is a standard internationalization package by GNU. It requires that the environment variable `name_of_program` be set to the name of the program you wish to be releasing.
+`./release.yml` is a template for `envsubst`, shipped with `gettext`, which is a standard internationalization package by GNU. It requires that the environment variable `name_of_program` be set to the name of the program you wish to be releasing. Then `envsubst` will work as a filter, instantiating the template into a ready-made workflow script.
 
-Here is one example of how you can instantiate this template to your project:
+Here is one example of how you can instantiate the template to your project:
 
 ```
 % name_of_program=`basename $(pwd)` envsubst '$name_of_program' < ./release.yml > .github/workflows/release.yml
