@@ -29,4 +29,3 @@ Now you should see the workflow running on GitHub. After some time, you will s
 ## features
 
 * Will build executables for Linux, MacOS and Windows out of the box.
-* Will share workflow cache with [`haskell-ci`](https://github.com/haskell-CI/haskell-ci).
