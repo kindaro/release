@@ -1,4 +1,13 @@
-#!/bin/sh -e
+#!/bin/sh -ex
+
+echo 'Regenerating `haskell-ci.yml`…'
+haskell-ci regenerate
+if ! git diff --quiet '.github/workflows/haskell-ci.yml'
+then
+    git reset
+    git add '.github/workflows/haskell-ci.yml'
+    git commit --message 'Update `haskell-ci.yml`.'
+fi
 
 echo 'Writing `release.yml`…'
 name_of_program="$(basename "$(pwd)")" envsubst '$name_of_program' < ./release.yml > .github/workflows/release.yml
