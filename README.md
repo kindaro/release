@@ -29,3 +29,4 @@ Now you should see the workflow running on GitHub. After some time, you will s
 ## features
 
 * Will build executables for Linux, MacOS and Windows out of the box.
+  - But only if `haskell-ci` succeeds.
