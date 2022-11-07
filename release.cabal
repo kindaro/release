@@ -1,6 +1,6 @@
 cabal-version:   2.2
 name:            release
-version:         0.2.1.0
+version:         0.3
 license:         NONE
 author:          kindaro@gmail.com
 maintainer:      Ignat Insarov
